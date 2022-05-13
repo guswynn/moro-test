@@ -1,0 +1,11 @@
+[package]
+name = "moro-test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+moro = "0.1.1"
+# moro = { version = "0.1.1", path = "../moro" }
+tokio = { version = "1.18.2", features = ["full"] }

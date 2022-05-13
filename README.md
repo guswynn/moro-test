@@ -94,7 +94,37 @@ This is very likely not always possible for many real-world examples.
 
 ### Conclusion on cancellation-safety
 It would be nice to be able to push users as aggresively as possible to the last 2 examples here.
-Structured, local concurrency 
+
+### Just not using select!
+There is also an argument to be made that `select!` is too hard to use correctly,
+and instead, just using `task` themselves is the best route.
+
+```
+cargo run --examples no_select # runs `examples/no_select.rs`
+```
+shows what this could look like, for the same motivating problem.
+
+```
+cargo run --examples no_select_shutdown # runs `examples/no_select_shutdown.rs`
+```
+Is the same, but:
+- Shows what shutdown could look like. Note that we definitely can and do
+drop futures here, in the middle, at yield points, but in my experience,
+this is fine if the loop is ending.
+  - Note that each select! branch becomes its OWN `loop {}` here
+
+For extra credit, I merged `no_select_shutdown` and `canonical_moro_fix_locking`, to try to show
+what a full concurrent loop may look like in production:
+
+```
+cargo run --examples final # runs `examples/final.rs`
+```
+Note that this uses interior-mutability to allow the branches to interact with the same state
+safely. This uses locks, but safe exclusivity would work fine using `RefCell` and friends,
+if we dropped the `Send` bound on `Scope::spawn`.
+
+Note that the core correctness reasoning here is now the exact same kind of reasoning
+you need to do when using threads and locks: how can each `lock` call interleave with the others.
 
 
 ## Scoped parallelism

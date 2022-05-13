@@ -1,6 +1,7 @@
 use std::time::Duration;
 
-use tokio::time::{interval, sleep};
+use tokio::time::{interval, sleep
+};
 
 struct StateKeeper {
     // Must be kept even

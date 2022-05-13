@@ -57,7 +57,6 @@ async fn core_loop() {
     }
 
     let scope = moro::async_scope!(|scope| {
-
         // boxing is because currently `moro` "JoinHandle"'s are not `Unpin`,
         // but we can easily imagine they are.
         let mut tick_join_handle = Box::pin(scope.spawn(state.tick()));

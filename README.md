@@ -16,7 +16,7 @@ cancellable at _any_ yield point.
 - Patterns build on top of `Future`s to add concurrency typically have
 limitations:
  - `FuturesUnordered` and friends have complex performance characteristics,
- and have a limited API
+ and have a limited API ([this is one interesting example](https://github.com/rust-lang/futures-rs/issues/2387)).
  - _tasks_, as implemented by various runtimes/executors, can be
  structured and composed in complex ways, but come with a `'static`
  bound.

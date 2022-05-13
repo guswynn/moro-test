@@ -28,7 +28,6 @@ lightweight _tasks_ in local, _scoped_
 
 
 ## Cancellation-safety
-
 `tokio::select!`, `futures::select!`, and others, are similar macros that are
 commonly used to compose multiple futures together. This crate contains multiple
 examples to show off a common issue with common usages of these primitives, and
@@ -93,6 +92,35 @@ cargo run --examples canonical_moro_fix_ownership # runs `examples/canonical_mor
 uses ownership semantics to avoid both erroneous drops AND the use of interior mutability.
 This is very likely not always possible for many real-world examples.
 
-### Conclusion
+### Conclusion on cancellation-safety
 It would be nice to be able to push users as aggresively as possible to the last 2 examples here.
 Structured, local concurrency 
+
+
+## Scoped parallelism
+Another issue that arises when writing concurrent code is that _borrowing_,
+while also obtaining _parallelism_ is difficult. In synchronous code, this
+is typically accomplished by using
+[crossbeam scopes](https://docs.rs/crossbeam/latest/crossbeam/fn.scope.html),
+or [rayon scopes](https://docs.rs/rayon/latest/rayon/fn.scope.html). In my
+_personal_ experience, people writing async-code are interested in
+using as much performance as their executor can offer them, and therefore
+reach for currently-doesnt-really-exist "scoped" task spawning.
+
+`examples/parallelism.rs` uses a WILDLY unsafe addition I made to `moro` to show
+what using _scoped_ async task spawning could look like.
+
+```
+cargo run --examples parallelism --
+```
+runs about twice as slow as
+```
+cargo run --examples parallelism -- --parallel
+```
+but the `--ub` (undefined-behavior) flag, coupled with `--parallel`
+shows what can currently happen with this `unsafe` api.
+
+### Conclusion on Scoped parallelism
+I think its valuable to think about what needs to be added to `moro` and/or
+the Rust language to support this api. See the inline comments for more
+information about what may be required.

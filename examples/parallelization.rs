@@ -39,6 +39,21 @@ async fn bench(parallel: bool, ub: bool) {
         (&mut scope).now_or_never();
         (&mut scope).now_or_never();
         (&mut scope).now_or_never();
+
+        // A note on why this is ub, and how it may be fixable:
+        //
+        // The tokio tasks spawned above require that this future is
+        // not destroyed until they finish. The `.await` below does
+        // just that, but failing to _fully_ `await`
+        // the `ScopeBody` future, (or, something like a panic)
+        // requires that we wait for the sub-tasks to be done.
+        // I believe this may require `AsyncDrop`.
+        //
+        // The problem with that is that `std::mem::forget`,
+        // a reference-cycle, etc. may cause that drop impl
+        // to not called.
+        // TODO(guswynn): update this documentation
+        // as I obtain more information.
     } else {
         scope.await
     }
